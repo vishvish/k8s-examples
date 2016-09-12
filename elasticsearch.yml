@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-rest
+  labels:
+    app: elasticsearch
+    tier: backend
+    role: rest
+spec:
+  ports:
+  - port: 9200
+  selector:
+    app: elasticsearch
+    tier: backend
+    role: master
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-native
+  labels:
+    app: elasticsearch
+    tier: backend
+    role: native
+spec:
+  ports:
+  - port: 9300
+  selector:
+    app: elasticsearch
+    tier: backend
+    role: master
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+    role: master
+    tier: backend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: master
+        image: yep1/usergrid-elasticsearch
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 9200
+        - containerPort: 9300
+

@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra-thrift
+  labels:
+    app: cassandra
+    tier: backend
+    role: thrift
+spec:
+  ports:
+  - port: 9160
+  selector:
+    app: cassandra
+    tier: backend
+    role: master
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra-cql
+  labels:
+    app: cassandra
+    tier: backend
+    role: cql
+spec:
+  ports:
+  - port: 9402
+  selector:
+    app: cassandra
+    tier: backend
+    role: master
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cassandra
+  labels:
+    app: cassandra
+    role: master
+    tier: backend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cassandra
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: master
+        image: yep1/usergrid-cassandra
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 9160
+        - containerPort: 9402
+
